@@ -40,7 +40,7 @@ class _UserBlogsScreenState extends State<UserBlogsScreen> {
   Widget build(BuildContext context) {
     final productsData = Provider.of<Blogs>(context);
     final filteredProducts = productsData.items.where((product) =>
-        product.name.toLowerCase().contains(_searchQuery.toLowerCase()));
+        (product['name']).toLowerCase().contains(_searchQuery.toLowerCase()));
 
     return Scaffold(
       appBar: AppBar(
@@ -77,9 +77,9 @@ class _UserBlogsScreenState extends State<UserBlogsScreen> {
                 itemBuilder: (_, i) => Column(
                   children: [
                     UserBlogItem(
-                      filteredProducts.toList()[i].id,
-                      filteredProducts.toList()[i].name,
-                      filteredProducts.toList()[i].imageUrl,
+                      filteredProducts.toList()[i]['id'],
+                      filteredProducts.toList()[i]['name'],
+                      filteredProducts.toList()[i]['imageUrl'],
                     ),
                   ],
                 ),

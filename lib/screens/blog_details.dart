@@ -21,7 +21,7 @@ class BlogDetailScreen extends StatelessWidget {
     ).findById(blogId);
     return Scaffold(
       appBar: AppBar(
-        title: Text(loadedBlog.name),
+        title: Text(loadedBlog['name']),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -30,13 +30,13 @@ class BlogDetailScreen extends StatelessWidget {
               height: 300,
               width: double.infinity,
               child: Image.network(
-                loadedBlog.imageUrl,
+                loadedBlog['imageUrl'],
                 fit: BoxFit.cover,
               ),
             ),
             const SizedBox(height: 10),
             Text(
-              '\$${loadedBlog.title}',
+              '\$${loadedBlog['title']}',
               style: const TextStyle(
                 color: Colors.grey,
                 fontSize: 20,
@@ -49,7 +49,7 @@ class BlogDetailScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 10),
               width: double.infinity,
               child: Text(
-                loadedBlog.description,
+                loadedBlog['description'],
                 textAlign: TextAlign.center,
                 softWrap: true,
               ),

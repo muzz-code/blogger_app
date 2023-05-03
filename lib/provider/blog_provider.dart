@@ -4,70 +4,82 @@ import 'dart:convert';
 
 import 'blog.dart';
 
-
 class Blogs with ChangeNotifier {
-  List<Blog> _items = [
-    Blog(
-      id: 'p1',
-      name: 'Hope',
-      description: 'Politics is a very important topic that affects us all',
-      title: 'Politics',
-      imageUrl:
-          'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-    ),
-    Blog(
-      id: 'p2',
-      name: 'Eddy',
-      description: 'Geography is older than even the existence of man',
-      title: 'Geography',
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trousers%2C_dress_%28AM_1960.022-8%29.jpg/512px-Trousers%2C_dress_%28AM_1960.022-8%29.jpg',
-    ),
-    Blog(
-      id: 'p3',
-      name: 'Osasu',
-      description: 'Medicine is the single most important subject.',
-      title: 'Geography',
-      imageUrl:
-          'https://live.staticflickr.com/4043/4438260868_cc79b3369d_z.jpg',
-    ),
-    Blog(
-      id: 'p4',
-      name: 'Onome',
-      description: 'Prepare any meal you want.',
-      title: 'Food',
-      imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
-    ),
+  List<Map<String, dynamic>> blogs = [
+    {
+      "id": "p1",
+      "name": "Hope",
+      "description": "Politics is a very important topic that affects us all",
+      "title": "Politics",
+      "imageUrl":
+          "https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg",
+      "isFavourite": true
+    },
+    {
+      "id": "p2",
+      "name": "Eddy",
+      "description": "Geography is older than even the existence of man",
+      "title": "Geography",
+      "imageUrl":
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trousers%2C_dress_%28AM_1960.022-8%29.jpg/512px-Trousers%2C_dress_%28AM_1960.022-8%29.jpg",
+      "isFavourite": true
+    },
+    {
+      "id": "p3",
+      "name": "Osasu",
+      "description": "Medicine is the single most important subject.",
+      "title": "Geography",
+      "imageUrl":
+          "https://live.staticflickr.com/4043/4438260868_cc79b3369d_z.jpg",
+      "isFavourite": true
+    },
+    {
+      "id": "p4",
+      "name": "Onome",
+      "description": "Prepare any meal you want.",
+      "title": "Food",
+      "imageUrl":
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg",
+      "isFavourite": true
+    }
   ];
 
-  List<Blog> get items {
-    return [..._items];
+  List<Map<String, dynamic>> get items {
+    return [...blogs];
   }
 
-  List<Blog> get favoriteItems {
-    return _items.where((blogItem) => blogItem.isFavourite).toList();
+  List<Map<String, dynamic>> get favoriteItems {
+    return blogs.where((blogItem) => blogItem['isFavourite'] as bool).toList();
   }
 
-  Blog findById(String id) {
-    return _items.firstWhere((blog) => blog.id == id);
+  Map<String, dynamic> findById(String id) {
+    return blogs.firstWhere((blog) => (blog['id'] as String) == id);
   }
 
   void addBlog(Blog blog) {
-    final newBlog = Blog(
-        name: blog.name,
-        imageUrl: blog.imageUrl,
-        id: DateTime.now().toString(),
-        description: blog.description,
-        title: blog.title);
-    _items.add(newBlog);
+    blogs.add({
+      "id": blog.id,
+      "name": blog.name,
+      "description": blog.description,
+      "title": blog.title,
+      "imageUrl": blog.imageUrl,
+      "isFavourite": blog.isFavourite
+    });
     notifyListeners();
   }
 
   void updateBlog(String id, Blog newBlog) {
-    final blogIndex = _items.indexWhere((prod) => prod.id == id);
+    final blogIndex = blogs.indexWhere((blog) => (blog['id'] as String) == id);
+
     if (blogIndex >= 0) {
-      _items[blogIndex] = newBlog;
+      Map<String, dynamic> oldBlog = blogs[blogIndex];
+      oldBlog['id'] = newBlog.id;
+      oldBlog['title'] = newBlog.title;
+      oldBlog['name'] = newBlog.name;
+      oldBlog['description'] = newBlog.description;
+      oldBlog['imageUrl'] = newBlog.imageUrl;
+      oldBlog['isFavourite'] = newBlog.isFavourite;
+
       notifyListeners();
     } else {
       print('...');
@@ -75,7 +87,7 @@ class Blogs with ChangeNotifier {
   }
 
   void deleteBlog(String id) {
-    _items.removeWhere((prod) => prod.id == id);
+    blogs.removeWhere((prod) => (prod['id'] as String) == id);
     notifyListeners();
   }
 }
