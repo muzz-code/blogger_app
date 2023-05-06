@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import '../widgets/image_picker.dart';
 
 import '../provider/blog.dart';
 import '../provider/blog_provider.dart';
@@ -13,6 +17,20 @@ class EditBlogScreen extends StatefulWidget {
 }
 
 class _EditBlogScreenState extends State<EditBlogScreen> {
+  File? image;
+
+  Future pickImage(ImageSource source) async {
+    try {
+      final image = await ImagePicker().pickImage(source: source);
+      if (image == null) return;
+
+      final imageTemporary = File(image.path);
+      setState(() => this.image = imageTemporary);
+    } on PlatformException catch (e) {
+      print('failed to pick image: $e');
+    }
+  }
+
   final _titleFocusNode = FocusNode();
   final _descriptionFocusNode = FocusNode();
   final _imageUrlController = TextEditingController();
@@ -56,7 +74,7 @@ class _EditBlogScreenState extends State<EditBlogScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Blog'),
+        title: const Text('Edit Blog'),
         actions: <Widget>[
           IconButton(onPressed: _saveForm, icon: Icon(Icons.save))
         ],
@@ -67,6 +85,7 @@ class _EditBlogScreenState extends State<EditBlogScreen> {
             key: _form,
             child: ListView(
               children: <Widget>[
+                imageProfile(),
                 TextFormField(
                   decoration: InputDecoration(labelText: 'name'),
                   textInputAction: TextInputAction.next,
@@ -130,54 +149,79 @@ class _EditBlogScreenState extends State<EditBlogScreen> {
                     return null;
                   },
                 ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Container(
-                      width: 100,
-                      height: 100,
-                      margin: EdgeInsets.only(top: 8, right: 10),
-                      decoration:
-                          BoxDecoration(border: Border.all(color: Colors.grey)),
-                      child: _imageUrlController.text.isEmpty
-                          ? Text('Enter a URL')
-                          : FittedBox(
-                              child: Image.network(
-                                _imageUrlController.text,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                    ),
-                    Expanded(
-                      child: TextFormField(
-                        decoration: InputDecoration(labelText: 'Image URL'),
-                        keyboardType: TextInputType.url,
-                        textInputAction: TextInputAction.done,
-                        controller: _imageUrlController,
-                        focusNode: _imageUrlFocusNode,
-                        onSaved: (value) {
-                          _editedBlog = Blog(
-                              name: _editedBlog.name,
-                              imageUrl: value!,
-                              id: '',
-                              description: _editedBlog.description,
-                              title: _editedBlog.title);
-                        },
-                        onFieldSubmitted: (_) {
-                          _saveForm();
-                        },
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'please enter a value';
-                          }
-                          return null;
-                        },
-                      ),
-                    )
-                  ],
-                )
               ],
             )),
+      ),
+    );
+  }
+
+  Widget imageProfile() {
+    return Center(
+      child: Stack(children: <Widget>[
+        const CircleAvatar(
+            radius: 80.0,
+            backgroundImage: AssetImage("assets/images/tiger.jpeg")
+            // image == null
+            //     ? AssetImage("assets/tiger.jpeg")
+            //     : FileImage(File(_imageFile.path)),
+            ),
+        Positioned(
+          bottom: 20.0,
+          right: 20.0,
+          child: InkWell(
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                builder: ((builder) => bottomSheet()),
+              );
+            },
+            child: const Icon(
+              Icons.camera_alt,
+              color: Colors.teal,
+              size: 28.0,
+            ),
+          ),
+        ),
+      ]),
+    );
+  }
+
+  Widget bottomSheet() {
+    return Container(
+      height: 100.0,
+      width: MediaQuery.of(context).size.width,
+      margin: const EdgeInsets.symmetric(
+        horizontal: 20,
+        vertical: 20,
+      ),
+      child: Column(
+        children: <Widget>[
+          const Text(
+            "Choose Profile photo",
+            style: TextStyle(
+              fontSize: 20.0,
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+            TextButton.icon(
+              icon: const Icon(Icons.camera),
+              onPressed: () {
+                pickImage(ImageSource.camera);
+              },
+              label: const Text("Camera"),
+            ),
+            TextButton.icon(
+              icon: const Icon(Icons.image),
+              onPressed: () {
+                pickImage(ImageSource.gallery);
+              },
+              label: const Text("Gallery"),
+            ),
+          ])
+        ],
       ),
     );
   }
